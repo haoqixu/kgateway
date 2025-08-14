@@ -32,6 +32,8 @@ spec:
             type: object
           spec:
             properties:
+              acceptHttp10:
+                type: boolean
               accessLog:
                 items:
                   properties:

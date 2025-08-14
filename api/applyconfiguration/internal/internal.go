@@ -1174,6 +1174,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.kgateway-dev.kgateway.v2.api.v1alpha1.HTTPListenerPolicySpec
   map:
     fields:
+    - name: acceptHttp10
+      type:
+        scalar: boolean
     - name: accessLog
       type:
         list:
