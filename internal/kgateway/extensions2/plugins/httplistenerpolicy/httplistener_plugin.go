@@ -65,6 +65,7 @@ type httpListenerPolicy struct {
 	// and the final config is then marshalled.
 	tracingProvider *envoytracev3.OpenTelemetryConfig
 	tracingConfig   *envoy_hcm.HttpConnectionManager_Tracing
+	acceptHttp10    *bool
 }
 
 func (d *httpListenerPolicy) CreationTime() time.Time {
@@ -141,6 +142,10 @@ func (d *httpListenerPolicy) Equals(in any) bool {
 	}
 
 	if !cmputils.PointerValsEqual(d.preserveHttp1HeaderCase, d2.preserveHttp1HeaderCase) {
+		return false
+	}
+
+	if !cmputils.PointerValsEqual(d.acceptHttp10, d2.acceptHttp10) {
 		return false
 	}
 
@@ -226,6 +231,7 @@ func NewPlugin(ctx context.Context, commoncol *common.CommonCollections) extensi
 				streamIdleTimeout:          streamIdleTimeout,
 				healthCheckPolicy:          healthCheckPolicy,
 				preserveHttp1HeaderCase:    i.Spec.PreserveHttp1HeaderCase,
+				acceptHttp10:               i.Spec.AcceptHttp10,
 			},
 			TargetRefs: pluginsdkutils.TargetRefsToPolicyRefs(i.Spec.TargetRefs, i.Spec.TargetSelectors),
 			Errors:     errs,
@@ -306,7 +312,9 @@ func (p *httpListenerPolicyPluginGwPass) ApplyHCM(
 	}
 
 	if policy.preserveHttp1HeaderCase != nil && *policy.preserveHttp1HeaderCase {
-		out.HttpProtocolOptions = &envoycorev3.Http1ProtocolOptions{}
+		if out.HttpProtocolOptions == nil {
+			out.HttpProtocolOptions = &envoycorev3.Http1ProtocolOptions{}
+		}
 		preservecaseAny, err := utils.MessageToAny(&preserve_case_v3.PreserveCaseFormatterConfig{})
 		if err != nil {
 			// shouldn't happen
@@ -321,6 +329,13 @@ func (p *httpListenerPolicyPluginGwPass) ApplyHCM(
 				},
 			},
 		}
+	}
+
+	if policy.acceptHttp10 != nil && *policy.acceptHttp10 {
+		if out.HttpProtocolOptions == nil {
+			out.HttpProtocolOptions = &envoycorev3.Http1ProtocolOptions{}
+		}
+		out.HttpProtocolOptions.AcceptHttp_10 = true
 	}
 
 	return nil

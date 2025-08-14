@@ -3935,6 +3935,13 @@ func schema_kgateway_v2_api_v1alpha1_HTTPListenerPolicySpec(ref common.Reference
 							Format:      "",
 						},
 					},
+					"acceptHttp10": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AcceptHTTP10 determines whether to accept incoming HTTP/1.0 and HTTP 0.9 requests.",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
 				},
 			},
 		},

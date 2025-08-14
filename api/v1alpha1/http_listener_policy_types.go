@@ -104,6 +104,10 @@ type HTTPListenerPolicySpec struct {
 	// See here for more information: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/header_casing
 	// +optional
 	PreserveHttp1HeaderCase *bool `json:"preserveHttp1HeaderCase,omitempty"`
+
+	// AcceptHTTP10 determines whether to accept incoming HTTP/1.0 and HTTP 0.9 requests.
+	// +optional
+	AcceptHttp10 *bool `json:"acceptHttp10,omitempty"`
 }
 
 // AccessLog represents the top-level access log configuration.
