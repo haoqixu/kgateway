@@ -52,6 +52,7 @@ type httpListenerPolicy struct {
 	xffNumTrustedHops          *uint32
 	serverHeaderTransformation *envoy_hcm.HttpConnectionManager_ServerHeaderTransformation
 	streamIdleTimeout          *time.Duration
+	idleTimeout                *time.Duration
 	healthCheckPolicy          *healthcheckv3.HealthCheck
 	preserveHttp1HeaderCase    *bool
 }
@@ -102,6 +103,11 @@ func (d *httpListenerPolicy) Equals(in any) bool {
 
 	// Check streamIdleTimeout
 	if !cmputils.PointerValsEqual(d.streamIdleTimeout, d2.streamIdleTimeout) {
+		return false
+	}
+
+	// Check idleTimeout
+	if !cmputils.PointerValsEqual(d.idleTimeout, d2.idleTimeout) {
 		return false
 	}
 
@@ -188,6 +194,12 @@ func NewPlugin(ctx context.Context, commoncol *common.CommonCollections) extensi
 			streamIdleTimeout = &duration
 		}
 
+		var idleTimeout *time.Duration
+		if i.Spec.IdleTimeout != nil {
+			duration := i.Spec.IdleTimeout.Duration
+			idleTimeout = &duration
+		}
+
 		healthCheckPolicy := convertHealthCheckPolicy(i)
 
 		pol := &ir.PolicyWrapper{
@@ -202,6 +214,7 @@ func NewPlugin(ctx context.Context, commoncol *common.CommonCollections) extensi
 				xffNumTrustedHops:          i.Spec.XffNumTrustedHops,
 				serverHeaderTransformation: serverHeaderTransformation,
 				streamIdleTimeout:          streamIdleTimeout,
+				idleTimeout:                idleTimeout,
 				healthCheckPolicy:          healthCheckPolicy,
 				preserveHttp1HeaderCase:    i.Spec.PreserveHttp1HeaderCase,
 			},
@@ -277,6 +290,14 @@ func (p *httpListenerPolicyPluginGwPass) ApplyHCM(
 	// translate streamIdleTimeout
 	if policy.streamIdleTimeout != nil {
 		out.StreamIdleTimeout = durationpb.New(*policy.streamIdleTimeout)
+	}
+
+	// translate idleTimeout
+	if policy.idleTimeout != nil {
+		if out.CommonHttpProtocolOptions == nil {
+			out.CommonHttpProtocolOptions = &envoycorev3.HttpProtocolOptions{}
+		}
+		out.CommonHttpProtocolOptions.IdleTimeout = durationpb.New(*policy.idleTimeout)
 	}
 
 	if policy.preserveHttp1HeaderCase != nil && *policy.preserveHttp1HeaderCase {

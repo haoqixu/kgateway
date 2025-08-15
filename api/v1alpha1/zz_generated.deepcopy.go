@@ -2147,6 +2147,11 @@ func (in *HTTPListenerPolicySpec) DeepCopyInto(out *HTTPListenerPolicySpec) {
 		*out = new(metav1.Duration)
 		**out = **in
 	}
+	if in.IdleTimeout != nil {
+		in, out := &in.IdleTimeout, &out.IdleTimeout
+		*out = new(metav1.Duration)
+		**out = **in
+	}
 	if in.HealthCheck != nil {
 		in, out := &in.HealthCheck, &out.HealthCheck
 		*out = new(EnvoyHealthCheck)
