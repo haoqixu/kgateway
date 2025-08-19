@@ -3937,7 +3937,7 @@ func schema_kgateway_v2_api_v1alpha1_HTTPListenerPolicySpec(ref common.Reference
 					},
 					"acceptHttp10": {
 						SchemaProps: spec.SchemaProps{
-							Description: "AcceptHTTP10 determines whether to accept incoming HTTP/1.0 and HTTP 0.9 requests.",
+							Description: "AcceptHTTP10 determines whether to accept incoming HTTP/1.0 and HTTP 0.9 requests. See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
