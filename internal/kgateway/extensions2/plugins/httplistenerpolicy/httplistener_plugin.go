@@ -63,9 +63,10 @@ type httpListenerPolicy struct {
 	// Since the gateway name can only be determined during translation, the tracing config is split into the provider
 	// and the actual config. During translation, the default serviceName is set if not already provided
 	// and the final config is then marshalled.
-	tracingProvider *envoytracev3.OpenTelemetryConfig
-	tracingConfig   *envoy_hcm.HttpConnectionManager_Tracing
-	acceptHttp10    *bool
+	tracingProvider      *envoytracev3.OpenTelemetryConfig
+	tracingConfig        *envoy_hcm.HttpConnectionManager_Tracing
+	acceptHttp10         *bool
+	defaultHostForHttp10 *string
 }
 
 func (d *httpListenerPolicy) CreationTime() time.Time {
@@ -146,6 +147,10 @@ func (d *httpListenerPolicy) Equals(in any) bool {
 	}
 
 	if !cmputils.PointerValsEqual(d.acceptHttp10, d2.acceptHttp10) {
+		return false
+	}
+
+	if !cmputils.PointerValsEqual(d.defaultHostForHttp10, d2.defaultHostForHttp10) {
 		return false
 	}
 
@@ -232,6 +237,7 @@ func NewPlugin(ctx context.Context, commoncol *common.CommonCollections) extensi
 				healthCheckPolicy:          healthCheckPolicy,
 				preserveHttp1HeaderCase:    i.Spec.PreserveHttp1HeaderCase,
 				acceptHttp10:               i.Spec.AcceptHttp10,
+				defaultHostForHttp10:       i.Spec.DefaultHostForHttp10,
 			},
 			TargetRefs: pluginsdkutils.TargetRefsToPolicyRefs(i.Spec.TargetRefs, i.Spec.TargetSelectors),
 			Errors:     errs,
@@ -336,6 +342,13 @@ func (p *httpListenerPolicyPluginGwPass) ApplyHCM(
 			out.HttpProtocolOptions = &envoycorev3.Http1ProtocolOptions{}
 		}
 		out.HttpProtocolOptions.AcceptHttp_10 = true
+	}
+
+	if policy.defaultHostForHttp10 != nil {
+		if out.HttpProtocolOptions == nil {
+			out.HttpProtocolOptions = &envoycorev3.Http1ProtocolOptions{}
+		}
+		out.HttpProtocolOptions.DefaultHostForHttp_10 = *policy.defaultHostForHttp10
 	}
 
 	return nil

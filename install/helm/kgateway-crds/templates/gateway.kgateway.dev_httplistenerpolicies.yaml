@@ -663,6 +663,9 @@ spec:
                   type: object
                 maxItems: 16
                 type: array
+              defaultHostForHttp10:
+                minLength: 1
+                type: string
               healthCheck:
                 properties:
                   path:

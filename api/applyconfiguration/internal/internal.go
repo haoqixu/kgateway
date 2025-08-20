@@ -1188,6 +1188,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.kgateway-dev.kgateway.v2.api.v1alpha1.AccessLog
           elementRelationship: atomic
+    - name: defaultHostForHttp10
+      type:
+        scalar: string
     - name: healthCheck
       type:
         namedType: com.github.kgateway-dev.kgateway.v2.api.v1alpha1.EnvoyHealthCheck
