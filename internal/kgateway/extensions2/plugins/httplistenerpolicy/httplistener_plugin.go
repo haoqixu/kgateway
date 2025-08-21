@@ -335,7 +335,7 @@ func (p *httpListenerPolicyPluginGwPass) ApplyHCM(
 		if out.CommonHttpProtocolOptions == nil {
 			out.CommonHttpProtocolOptions = &envoycorev3.HttpProtocolOptions{}
 		}
-		out.CommonHttpProtocolOptions.IdleTimeout = durationpb.New(*policy.idleTimeout)
+		out.GetCommonHttpProtocolOptions().IdleTimeout = durationpb.New(*policy.idleTimeout)
 	}
 
 	if policy.preserveHttp1HeaderCase != nil && *policy.preserveHttp1HeaderCase {
