@@ -210,17 +210,14 @@ func (p *endpointPickerPass) ApplyForBackend(
 		ra.MetadataMatch.FilterMetadata = make(map[string]*structpb.Struct)
 	}
 
-	// Ensure we are working with the latest set of endpoints for the pool.
-	eps := irPool.resolvePoolEndpoints(p.podIdx)
-	if len(eps) == 0 {
+	if len(irPool.endpoints) == 0 {
 		return fmt.Errorf("no endpoints found for InferencePool %s/%s",
 			irPool.obj.GetNamespace(),
 			irPool.obj.GetName())
 	}
-	irPool.setEndpoints(eps)
 
 	// Tell the EPP the subset of endpoints to choose from.
-	vs := make([]*structpb.Value, 0, len(eps))
+	vs := make([]*structpb.Value, 0, len(irPool.endpoints))
 	for _, ep := range irPool.getEndpoints() {
 		vs = append(vs, structpb.NewStringValue(ep.string()))
 	}
